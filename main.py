@@ -65,11 +65,11 @@ def post():
     body_error = request.form.get('body_error', '')
 
     # Form validation for empty values
-    if title == '':
-        title_error = "You left the title field blank"
-    if body == '':
-        body_error = "You left the body field blank"
     if not title or not body:
+        if title == '':
+            title_error = "You left the title field blank"
+        if body == '':
+            body_error = "You left the body field blank"
         return redirect(f'/newpost?title={title}&body={body}&title_error={title_error}&body_error={body_error}')
 
     # Add new post to database
