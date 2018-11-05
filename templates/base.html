@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Build a Blog</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/main.css') }}">
+    <title>Build a Blog{% block title %}{% endblock %}</title>
 </head>
 <body>
-    <h1><a href="/blog">Build A Blog</a></h1>
+    <a href="/blog"><h1>Build A Blog</h1></a>
     <nav>
         <a href="/blog">Main Blog Page</a>
         <a href="/newpost">Add a Blog Entry</a>
