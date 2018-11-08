@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 
+
+{% if posts|length == 1 %}
+    {% block title %}
+    {% for post in posts %}
+        - {{ post.title }}
+    {% endfor %}
+    {% endblock %}
+{% endif %}
+
 {% block content %}
 
 {% if posts|length == 0 %}
@@ -8,6 +17,7 @@
     {% for post in posts %}
         <a href="./blog?id={{ post.id }}"><h2>{{ post.title }}</h2></a>
         <p class="date">{{ post.date }}</p>
+        <a href="./blog?user-id={{ post.owner.id }}"><p class="author">{{ post.owner.username }}</p></a>
         <p>{{ post.body }}</p>
         <hr />
     {% endfor %}

@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static',filename='styles/main.css') }}">
-    <title>Build a Blog{% block title %}{% endblock %}</title>
+    <title>Blogz{% block title %}{% endblock %}</title>
 </head>
 <body>
-    <a href="/blog"><h1>Build A Blog</h1></a>
+    <a href="/blog"><h1>Blogz</h1></a>
     <nav>
+        <a href="/">Home</a>
         <a href="/blog">Main Blog Page</a>
         <a href="/newpost">Add a Blog Entry</a>
+        <a href="/login">Login</a>
+        <a href="/signup">Signup</a>
+        <a href="/logout">Logout</a>
+
     </nav>
     {% block content %} 
     

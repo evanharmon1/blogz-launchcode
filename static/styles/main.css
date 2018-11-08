@@ -22,16 +22,35 @@ p {
     color: red;
 }
 
-.date {
+.date, .author {
     color: turquoise;
 }
 
+nav {
+    border: 2px solid;
+    border-radius: 8px;
+    color:turquoise;
+    display: inline-block;
+    padding: 5px;
+}
+
+nav a:first-child { 
+    border-left: 0;
+}
+
 nav a {
-    border: 1px solid;
     color:turquoise;
     border-color: turquoise;
     font-size: 1.7em;
     text-decoration: none;
+    padding: 5px;
+    border-left: 1px solid;
+    margin: 0px;
+}
+
+nav a:hover {
+    color: white;
+    background-color: turquoise;
 }
 
 h3 {
