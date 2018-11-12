@@ -21,6 +21,23 @@
         <p>{{ post.body }}</p>
         <hr />
     {% endfor %}
+    {% if prev_url %}
+    Newer&nbsp;&nbsp;<a href="{{ prev_url }}">&lt;&lt;&lt;</a>&nbsp;
+    {% endif %}
+    {% for page in pagination %}
+        {% if page %}
+            {% if page != current_page %}
+                <a href="{{ url_for('blog', page=page) }}">{{ page }}</a>
+            {% else %}
+                <strong>{{ current_page }}</strong>
+            {% endif %}
+        {% else %}
+            <span>...</span>
+        {% endif %}
+    {% endfor %}
+    {% if next_url %}
+        &nbsp;<a href="{{ next_url }}">&gt;&gt;&gt;</a>&nbsp;&nbsp;Older
+    {% endif %}
 {% endif %}
 
 {% endblock %}

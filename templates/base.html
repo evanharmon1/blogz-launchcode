@@ -9,13 +9,15 @@
     <a href="/blog"><h1>Blogz</h1></a>
     <nav>
         <a href="/">Home</a>
-        <a href="/blog">Main Blog Page</a>
+        <a href="/blog">Blog</a>
         <a href="/newpost">Add a Blog Entry</a>
-        <a href="/login">Login</a>
-        <a href="/signup">Signup</a>
-        <a href="/logout">Logout</a>
-
     </nav>
+<!-- 	TODO logic to check for logged in user and display username if so and login/logout, etc. -->
+    <ul class="profile">
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Signup</a></li>
+        <li><a href="/logout">Logout</a></li>
+    </ul>
     {% block content %} 
     
     {% endblock %}

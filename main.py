@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, request, redirect, render_template, session, flash
+from flask import Flask, request, redirect, render_template, session, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 import cgi
 
@@ -44,9 +44,9 @@ class User(db.Model):
         return '<User %r>' % self.username
 
 
-#Get all posts unordered
+#Get paginated posts
 def get_posts():
-    return Blog.query.all()
+    return Blog.query.order_by("date desc").paginate(1, 2, False).items
 
 # Get all posts ordered from newest to oldest
 def get_ordered_posts():
@@ -75,6 +75,8 @@ def index():
 def blog():
     id = request.args.get('id', None)
     user_id = request.args.get('user-id', None)
+    page = request.args.get('page', 1, type=int)
+    current_page = page
 
     if id:
         posts = Blog.query.filter_by(id=id).all()
@@ -84,8 +86,10 @@ def blog():
         posts = Blog.query.filter_by(owner_id=user_id).all()
         return render_template('blog.html', posts=posts)
 
-    posts = get_ordered_posts()
-    return render_template('blog.html', posts=posts)
+    posts = Blog.query.order_by("date desc").paginate(page, 3, False)
+    next_url = url_for('blog', page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('blog', page=posts.prev_num) if posts.has_prev else None
+    return render_template('blog.html', posts=posts.items, next_url=next_url, prev_url=prev_url, pagination=posts.iter_pages(), current_page=current_page)
 
 
 # Add a new post
