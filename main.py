@@ -1,47 +1,9 @@
-from datetime import datetime
 from flask import Flask, request, redirect, render_template, session, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 import cgi
-
-# App & Database Initialization
-app = Flask(__name__)
-app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:pumpkinspice1928@localhost:8889/blogz'
-app.config['SQLALCHEMY_ECHO'] = True
-app.secret_key = "\xff&\xf9\x87\x81g\xa4'v$\xca\xaf\xea\xc0>\xb1\xfd\xb5;K\xab\xdbw\xbc"
-db = SQLAlchemy(app)
-
-
-# Class for blog post with automatic datetime added at creation
-class Blog(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(120), unique=True)
-    body = db.Column(db.Text)
-    date = db.Column(db.DateTime)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-       
-    def __init__(self, title, owner):
-        self.title = title
-        self.date = datetime.utcnow()
-        self.owner = owner # user object
-
-    def __repr__(self):
-        return '<Blog %r>' % self.title 
-
-
-# Class for users - relation to Blog class
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(25), unique=True)
-    password = db.Column(db.String(25))
-    blogs = db.relationship('Blog', backref='owner')
-
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-
-    def __repr__(self):
-        return '<User %r>' % self.username
+from app import app, db
+from models import User, Blog
+from hashutils import make_salt, make_pw_hash, check_pw_hash
 
 
 #Get paginated posts
@@ -151,7 +113,7 @@ def login():
         # Check for user in database
         user = User.query.filter_by(username=username).first()
         if user:
-            if password == user.password:
+            if check_pw_hash(password, user.pw_hash):
                 session['username'] = username
                 return redirect('/newpost')
         if user:
@@ -212,7 +174,7 @@ def signup():
             verify_password_error = 'Your passwords do not match'
             return redirect(f'/signup?username={username}&username_error={username_error}&password_error={password_error}&verify_password_error={verify_password_error}')
 
-        new_user = User(username, password)
+        new_user = User(username, make_pw_hash(password))
         db.session.add(new_user)
         db.session.commit()
         session['username'] = username
