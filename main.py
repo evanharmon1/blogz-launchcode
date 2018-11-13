@@ -38,17 +38,24 @@ def blog():
     id = request.args.get('id', None)
     user_id = request.args.get('user-id', None)
     page = request.args.get('page', 1, type=int)
-    current_page = page
+
+
 
     if id:
         posts = Blog.query.filter_by(id=id).all()
         return render_template('blog.html', posts=posts)
 
     if user_id:
-        posts = Blog.query.filter_by(owner_id=user_id).all()
-        return render_template('blog.html', posts=posts)
+        posts = Blog.query.filter_by(owner_id=user_id).order_by("date desc").paginate(page, 3, False)
+        # Pagination
+        current_page = page
+        next_url = url_for('blog', page=posts.next_num) if posts.has_next else None
+        prev_url = url_for('blog', page=posts.prev_num) if posts.has_prev else None
+        return render_template('blog.html', posts=posts.items, next_url=next_url, prev_url=prev_url, pagination=posts.iter_pages(), current_page=current_page)
 
+    # Pagination
     posts = Blog.query.order_by("date desc").paginate(page, 3, False)
+    current_page = page
     next_url = url_for('blog', page=posts.next_num) if posts.has_next else None
     prev_url = url_for('blog', page=posts.prev_num) if posts.has_prev else None
     return render_template('blog.html', posts=posts.items, next_url=next_url, prev_url=prev_url, pagination=posts.iter_pages(), current_page=current_page)

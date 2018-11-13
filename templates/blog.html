@@ -22,7 +22,7 @@
         <hr />
     {% endfor %}
     {% if prev_url %}
-    Newer&nbsp;&nbsp;<a href="{{ prev_url }}">&lt;&lt;&lt;</a>&nbsp;
+    <a href="{{ prev_url }}">&lt;&lt;&lt;</a>&nbsp;
     {% endif %}
     {% for page in pagination %}
         {% if page %}
@@ -36,7 +36,7 @@
         {% endif %}
     {% endfor %}
     {% if next_url %}
-        &nbsp;<a href="{{ next_url }}">&gt;&gt;&gt;</a>&nbsp;&nbsp;Older
+        &nbsp;<a href="{{ next_url }}">&gt;&gt;&gt;</a>
     {% endif %}
 {% endif %}
 
