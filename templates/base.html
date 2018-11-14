@@ -12,7 +12,6 @@
         <a href="/blog">Blog</a>
         <a href="/newpost">Add a Blog Entry</a>
     </nav>
-<!-- 	TODO logic to check for logged in user and display username if so and login/logout, etc. -->
     {% if session['username'] %}
         <aside class="profile">
             Welcome, {{ session['username'] }}!&nbsp;
