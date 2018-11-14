@@ -17,7 +17,7 @@ class Blog(db.Model):
         self.owner = owner # user object
 
     def __repr__(self):
-        return '<Blog %r>' % self.title 
+        return '<Blog %r>' % self.title
 
 
 # Class for users - relation to Blog class

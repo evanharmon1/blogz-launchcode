@@ -6,18 +6,22 @@ from models import User, Blog
 from hashutils import make_salt, make_pw_hash, check_pw_hash
 
 
-#Get paginated posts
+#Get paginated posts ordered from newest to oldest
 def get_posts():
     return Blog.query.order_by("date desc").paginate(1, 2, False).items
-
-# Get all posts ordered from newest to oldest
-def get_ordered_posts():
-    return Blog.query.order_by("date desc").all()
 
 def get_users():
     return User.query.all()
 
+# Form validation for empty fields
+def check_empty(field, name):
+    if field == '':
+        return f'You left the {name} field blank'
+    else:
+        return ''
 
+
+# Require login for certain routes
 @app.before_request
 def require_login():
     allowed_routes = ['blog', 'index', 'login', 'signup', 'static']
@@ -38,8 +42,6 @@ def blog():
     id = request.args.get('id', None)
     user_id = request.args.get('user-id', None)
     page = request.args.get('page', 1, type=int)
-
-
 
     if id:
         posts = Blog.query.filter_by(id=id).all()
@@ -68,16 +70,10 @@ def newpost():
     if request.method == 'POST':
         title = request.form.get('title', '')
         body = request.form.get('body', '')
-        title_error = request.form.get('title_error', '')
-        body_error = request.form.get('body_error', '')
-
-        # Form validation for empty values
+    
+        # Check for empty form fields with check_empty() function
         if not title or not body:
-            if title == '':
-                title_error = "You left the title field blank"
-            if body == '':
-                body_error = "You left the body field blank"
-            return redirect(f'/newpost?title={title}&body={body}&title_error={title_error}&body_error={body_error}')
+            return redirect(f"/newpost?title={title}&body={body}&title_error={check_empty(title, 'title')}&body_error={check_empty(body, 'body')}")
 
         # Add new post to database
         username = session['username']
@@ -106,16 +102,10 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username', '')
         password = request.form.get('password', '')
-        username_error = ''
-        password_error = ''
 
-        # Form validation for empty values
+        # Form validation for empty values with check_empty() function
         if not username or not password:
-            if username == '':
-                username_error = 'You left the username field blank'
-            if password == '':
-                password_error = 'You left the password field blank'
-            return redirect(f'/login?username={username}&username_error={username_error}&password_error={password_error}')
+            return redirect(f"/login?username={username}&username_error={check_empty(username, 'username')}&password_error={check_empty(password, 'password')}")
         
         # Check for user in database
         user = User.query.filter_by(username=username).first()
@@ -123,19 +113,16 @@ def login():
             if check_pw_hash(password, user.pw_hash):
                 session['username'] = username
                 return redirect('/newpost')
-        if user:
-            if password != user.password:
+            if not check_pw_hash(password, user.pw_hash):
                 password_error = 'Username found, but password not correct'
                 return render_template('login.html', username=username, password_error=password_error)
         else:
             username_error = 'Username not found'
             return render_template('login.html', username=username, username_error=username_error)
 
-
     username = request.args.get('username', '')
     username_error = request.args.get('username_error', '')
     password_error = request.args.get('password_error', '')
-
     return render_template('login.html', username=username, username_error=username_error, password_error=password_error)
 
 
@@ -143,7 +130,6 @@ def login():
 def logout():
     del session['username']
     return redirect('/blog')
-
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -157,8 +143,7 @@ def signup():
         verify_password_error = ''
         user = User.query.filter_by(username=username).first()
 
-        # Form validation TODO refactor into a function
-        # TODO regex validation for length
+        # # Form validation: existing user, field length, empty fields, & verify password field match
         if user:
             if username == user.username:
                 username_error = 'User already exists. Please choose another username'
@@ -170,13 +155,7 @@ def signup():
             password_error = 'Password must be between 3 and 25 characters'
             return redirect(f'/signup?username={username}&username_error={username_error}&password_error={password_error}&verify_password_error={verify_password_error}')
         if not username or not password or not verify_password:
-            if username == '':
-                username_error = 'You left the username field blank'
-            if password == '':
-                password_error = 'You left the password field blank'
-            if verify_password == '':
-                verify_password_error = 'Please verify your password'
-            return redirect(f'/signup?username={username}&username_error={username_error}&password_error={password_error}&verify_password_error={verify_password_error}')
+            return redirect(f"/signup?username={username}&username_error={check_empty(username, 'username')}&password_error={check_empty(password, 'password')}&verify_password_error={check_empty(verify_password, 'verify password')}")
         if password != verify_password:
             verify_password_error = 'Your passwords do not match'
             return redirect(f'/signup?username={username}&username_error={username_error}&password_error={password_error}&verify_password_error={verify_password_error}')
@@ -187,12 +166,10 @@ def signup():
         session['username'] = username
         return redirect('/newpost')
 
-
     username = request.args.get('username', '')
     username_error = request.args.get('username_error', '')
     password_error = request.args.get('password_error', '')
     verify_password_error = request.args.get('verify_password_error', '')
-
     return render_template('signup.html', username=username, username_error=username_error, password_error=password_error, verify_password_error=verify_password_error)
 
     
