@@ -5,3 +5,5 @@ LaunchCode LC101 Python Flask Assignment - Deployed on DigitalOcean VM at https:
 * Form validation with dynamic error messages
 * User signup and authentication
 * Uses the MVC pattern and deployed on an Ubuntu server
+
+![app image](image.png)
