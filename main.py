@@ -1,5 +1,6 @@
 from flask import Flask, request, redirect, render_template, session, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 import cgi
 from app import app, db
 from models import User, Blog
@@ -8,7 +9,7 @@ from hashutils import make_salt, make_pw_hash, check_pw_hash
 
 #Get paginated posts ordered from newest to oldest
 def get_posts():
-    return Blog.query.order_by("date desc").paginate(1, 2, False).items
+    return Blog.query.order_by(text("date desc")).paginate(1, 2, False).items
 
 def get_users():
     return User.query.all()
@@ -48,7 +49,7 @@ def blog():
         return render_template('blog.html', posts=posts)
 
     if user_id:
-        posts = Blog.query.filter_by(owner_id=user_id).order_by("date desc").paginate(page, 3, False)
+        posts = Blog.query.filter_by(owner_id=user_id).order_by(text("date desc")).paginate(page, 3, False)
         # Pagination
         current_page = page
         next_url = url_for('blog', page=posts.next_num) if posts.has_next else None
@@ -56,7 +57,7 @@ def blog():
         return render_template('blog.html', posts=posts.items, next_url=next_url, prev_url=prev_url, pagination=posts.iter_pages(), current_page=current_page)
 
     # Pagination
-    posts = Blog.query.order_by("date desc").paginate(page, 3, False)
+    posts = Blog.query.order_by(text("date desc")).paginate(page, 3, False)
     current_page = page
     next_url = url_for('blog', page=posts.next_num) if posts.has_next else None
     prev_url = url_for('blog', page=posts.prev_num) if posts.has_prev else None
